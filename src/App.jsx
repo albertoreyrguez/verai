@@ -314,30 +314,41 @@ function HotelMap({ hotels, cart, onSelect, mobile }) {
 }
 
 function DateWindowPicker({ windows, selected, onSelect }) {
+  const [expanded, setExpanded] = useState(false);
   if (!windows?.length) return null;
   const priceBadge = f => f==="barato"?"green":f==="caro"?"red":"gray";
-  return (
-    <div style={{ marginBottom:12 }}>
-      <div style={{ fontSize:11, fontWeight:700, color:"#717171", textTransform:"uppercase", letterSpacing:.4, marginBottom:8 }}>Elige tu ventana de fechas</div>
-      <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
-        {windows.map((w,i) => {
-          const sel = selected?.start===w.start;
-          const nights = calcNights(w.start, w.end);
-          return (
-            <div key={i} onClick={()=>onSelect(sel?null:w)} style={{ background:"#FFF", border:"2px solid "+(sel?"#222":"#DDD"), borderRadius:12, padding:"10px 14px", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, flexWrap:"wrap", boxShadow:"0 2px 6px rgba(0,0,0,.06)" }}>
-              <div>
-                <div style={{ fontWeight:700, fontSize:13 }}>{w.start} → {w.end}</div>
-                <div style={{ fontSize:11, color:"#717171", marginTop:2 }}>{w.reason}</div>
-              </div>
-              <div style={{ display:"flex", gap:6, alignItems:"center" }}>
-                <Badge color="gray">{nights} noches</Badge>
-                {w.price_factor && <Badge color={priceBadge(w.price_factor)}>{w.price_factor}</Badge>}
-                {sel && <Badge color="green">✓ Seleccionada</Badge>}
-              </div>
-            </div>
-          );
-        })}
+  const chip = { display:"inline-flex", alignItems:"center", gap:8, background:"#F7F7F7", borderRadius:100, padding:"4px 12px", fontSize:12, color:"#222", cursor:"pointer", border:"none", fontFamily:"inherit", height:32, whiteSpace:"nowrap" };
+  if (selected) {
+    return (
+      <div style={{ marginBottom:8 }}>
+        <button onClick={()=>onSelect(null)} style={chip}>
+          📅 {selected.start} → {selected.end}{selected.price_factor ? ` · ${selected.price_factor}` : ""} <span style={{ color:"#717171" }}>✕</span>
+        </button>
       </div>
+    );
+  }
+  return (
+    <div style={{ marginBottom:8 }}>
+      <button onClick={()=>setExpanded(e=>!e)} style={chip}>
+        📅 Ver {windows.length} fechas sugeridas {expanded?"▴":"▾"}
+      </button>
+      {expanded && (
+        <div style={{ display:"flex", flexDirection:"column", gap:4, marginTop:8 }}>
+          {windows.map((w,i) => {
+            const nights = calcNights(w.start, w.end);
+            return (
+              <div key={i} onClick={()=>{ onSelect(w); setExpanded(false); }}
+                style={{ height:48, background:"#FFF", border:"1px solid #DDD", borderRadius:12, padding:"0 12px", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"space-between", gap:8, boxShadow:"0 1px 4px rgba(0,0,0,.06)" }}>
+                <span style={{ fontWeight:600, fontSize:12 }}>{w.start} → {w.end}</span>
+                <div style={{ display:"flex", gap:4, alignItems:"center" }}>
+                  <Badge color="gray">{nights}n</Badge>
+                  {w.price_factor && <Badge color={priceBadge(w.price_factor)}>{w.price_factor}</Badge>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
