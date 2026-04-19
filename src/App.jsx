@@ -116,8 +116,8 @@ function useToast() {
 function ToastContainer({ toasts }) {
   if (!toasts.length) return null;
   return (
-    <div style={{ position:"fixed", top:58, left:0, right:0, zIndex:600, display:"flex", flexDirection:"column", alignItems:"center", gap:6, pointerEvents:"none", padding:"0 16px" }}>
-      {toasts.map(t => <div key={t.id} style={{ background:t.color, color:"#fff", padding:"9px 20px", borderRadius:100, fontSize:13, fontWeight:600, boxShadow:"0 4px 14px rgba(0,0,0,.25)" }}>{t.msg}</div>)}
+    <div style={{ position:"fixed", top:56, left:0, right:0, zIndex:600, display:"flex", flexDirection:"column", alignItems:"center", gap:8, pointerEvents:"none", padding:"0 16px" }}>
+      {toasts.map(t => <div key={t.id} style={{ background:t.color, color:"#fff", padding:"8px 16px", borderRadius:100, fontSize:12, fontWeight:600, boxShadow:"0 4px 14px rgba(0,0,0,.25)" }}>{t.msg}</div>)}
     </div>
   );
 }
@@ -126,21 +126,21 @@ function Bar({ value, color="#FF385C" }) {
 }
 function Badge({ color="gray", children }) {
   const cl = { amber:{bg:"#FFF3E0",c:"#C96A00"}, green:{bg:"#EDFAEE",c:"#008A05"}, red:{bg:"#FFF0F3",c:"#FF385C"}, gray:{bg:"#F0F0F0",c:"#717171"} }[color]||{bg:"#F0F0F0",c:"#717171"};
-  return <span style={{ display:"inline-block", padding:"2px 10px", borderRadius:100, fontSize:11, fontWeight:600, background:cl.bg, color:cl.c }}>{children}</span>;
+  return <span style={{ display:"inline-block", padding:"2px 8px", borderRadius:100, fontSize:12, fontWeight:600, background:cl.bg, color:cl.c }}>{children}</span>;
 }
 function Stepper({ value, onChange, min=1 }) {
-  const bs = { width:28, height:28, borderRadius:8, border:"1px solid #DDD", background:"none", fontSize:16, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" };
+  const bs = { width:32, height:32, borderRadius:8, border:"1px solid #DDD", background:"none", fontSize:16, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" };
   return <div style={{ display:"flex", alignItems:"center", gap:8 }}><button style={bs} onClick={()=>onChange(Math.max(min,value-1))}>−</button><span style={{ fontWeight:700, fontSize:16, minWidth:20, textAlign:"center" }}>{value}</span><button style={bs} onClick={()=>onChange(value+1)}>+</button></div>;
 }
 function EmptyState({ icon="🗺️", title, sub }) {
-  return <div style={{ textAlign:"center", padding:"36px 20px", background:"#FFF", borderRadius:16, border:"1px solid #DDD" }}><div style={{ fontSize:36, marginBottom:10 }}>{icon}</div><div style={{ fontWeight:700, fontSize:15, marginBottom:6 }}>{title}</div>{sub&&<div style={{ fontSize:12, color:"#717171", lineHeight:1.6 }}>{sub}</div>}</div>;
+  return <div style={{ textAlign:"center", padding:"32px 16px", background:"#FFF", borderRadius:16, border:"1px solid #DDD" }}><div style={{ fontSize:32, marginBottom:8 }}>{icon}</div><div style={{ fontWeight:700, fontSize:16, marginBottom:8 }}>{title}</div>{sub&&<div style={{ fontSize:12, color:"#717171", lineHeight:1.6 }}>{sub}</div>}</div>;
 }
 function LinkPills({ links }) {
   return (
     <div style={{ display:"flex", flexWrap:"wrap", gap:6, marginTop:10 }}>
       {links.map((lk,i) => (
         <a key={i} href={lk.url} target="_blank" rel="noopener noreferrer"
-          style={{ padding:"5px 12px", borderRadius:100, fontSize:11, fontWeight:700, textDecoration:"none", color:"#fff", background:lk.c, display:"inline-block" }}>
+          style={{ padding:"4px 12px", borderRadius:100, fontSize:12, fontWeight:700, textDecoration:"none", color:"#fff", background:"#222", display:"inline-block" }}>
           {lk.l} ↗
         </a>
       ))}
@@ -154,27 +154,27 @@ function HotelCard({ hotel, swipeDir, dragX=0, mobile }) {
   const saveOp = dragX > 30 ? Math.min(1,(dragX-30)/60) : 0;
   return (
     <div style={{ position:"absolute", inset:0, background:"#FFF", borderRadius:20, overflow:"hidden", boxShadow:"0 8px 30px rgba(0,0,0,.14)", transform:swipeDir==="left"?"translateX(-130%) rotate(-18deg)":swipeDir==="right"?"translateX(130%) rotate(18deg)":dragX!==0?`translateX(${dragX}px) rotate(${dragX*.04}deg)`:"none", opacity:swipeDir?0:1, transition:swipeDir?"transform .38s cubic-bezier(.4,0,.2,1), opacity .38s":dragX!==0?"none":"transform .15s ease", cursor:"grab", userSelect:"none" }}>
-      <div style={{ position:"absolute", top:20, left:16, zIndex:10, opacity:skipOp, background:"#FF385C", color:"#fff", fontWeight:800, fontSize:15, padding:"5px 12px", borderRadius:8, letterSpacing:1 }}>SKIP</div>
-      <div style={{ position:"absolute", top:20, right:16, zIndex:10, opacity:saveOp, background:"#008A05", color:"#fff", fontWeight:800, fontSize:15, padding:"5px 12px", borderRadius:8, letterSpacing:1 }}>SAVE</div>
-      <div style={{ height:mobile?170:200, background:"#E8E8E8", position:"relative", overflow:"hidden" }}>
+      <div style={{ position:"absolute", top:16, left:16, zIndex:10, opacity:skipOp, background:"#FF385C", color:"#fff", fontWeight:800, fontSize:16, padding:"4px 12px", borderRadius:8, letterSpacing:1 }}>SKIP</div>
+      <div style={{ position:"absolute", top:16, right:16, zIndex:10, opacity:saveOp, background:"#008A05", color:"#fff", fontWeight:800, fontSize:16, padding:"4px 12px", borderRadius:8, letterSpacing:1 }}>SAVE</div>
+      <div style={{ height:mobile?160:200, background:"#E8E8E8", position:"relative", overflow:"hidden" }}>
         {imgOk ? <img src={`https://picsum.photos/seed/${enc(hotel.name)}/600/400`} alt={hotel.name} onError={()=>setImgOk(false)} style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
-          : <div style={{ width:"100%", height:"100%", background:"linear-gradient(135deg,#e8e4dc,#d0cbbe)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:40 }}>🏨</div>}
-        <div style={{ position:"absolute", inset:"auto 0 0", background:"linear-gradient(transparent,rgba(0,0,0,.65))", padding:"18px 14px 10px", display:"flex", justifyContent:"space-between", alignItems:"flex-end" }}>
-          <div style={{ display:"flex", gap:6, alignItems:"center" }}>
-            <span style={{ color:"#F5C518", fontSize:11 }}>{"★".repeat(Math.min(5,hotel.stars||3))}</span>
-            {hotel.verified&&<span style={{ background:"rgba(0,138,5,.8)", borderRadius:6, padding:"2px 7px", fontSize:9, fontWeight:700, color:"#fff" }}>✓ Real</span>}
+          : <div style={{ width:"100%", height:"100%", background:"linear-gradient(135deg,#e8e4dc,#d0cbbe)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:32 }}>🏨</div>}
+        <div style={{ position:"absolute", inset:"auto 0 0", background:"linear-gradient(transparent,rgba(0,0,0,.65))", padding:"16px 12px 8px", display:"flex", justifyContent:"space-between", alignItems:"flex-end" }}>
+          <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+            <span style={{ color:"#F5C518", fontSize:12 }}>{"★".repeat(Math.min(5,hotel.stars||3))}</span>
+            {hotel.verified&&<span style={{ background:"rgba(0,138,5,.8)", borderRadius:8, padding:"2px 8px", fontSize:12, fontWeight:700, color:"#fff" }}>✓ Real</span>}
           </div>
-          <div style={{ color:"#fff", fontWeight:800, fontSize:20 }}>{hotel.price_per_night}€<span style={{ fontWeight:400, fontSize:11, opacity:.8 }}>/n</span></div>
+          <div style={{ color:"#fff", fontWeight:800, fontSize:20 }}>{hotel.price_per_night}€<span style={{ fontWeight:400, fontSize:12, opacity:.8 }}>/n</span></div>
         </div>
       </div>
-      <div style={{ padding:"12px 14px 16px" }}>
-        <div style={{ fontWeight:700, fontSize:mobile?15:17, marginBottom:2 }}>{hotel.name}</div>
+      <div style={{ padding:"12px 16px" }}>
+        <div style={{ fontWeight:700, fontSize:mobile?14:16, marginBottom:4 }}>{hotel.name}</div>
         <div style={{ fontSize:12, color:"#717171", marginBottom:8 }}>{hotel.area} · {hotel.distance_center}</div>
         <div style={{ display:"flex", flexWrap:"wrap", gap:4 }}>
-          {(hotel.pros||[]).slice(0,2).map((p,i)=><span key={i} style={{ padding:"2px 8px", borderRadius:100, fontSize:10, fontWeight:600, background:"#EDFAEE", color:"#008A05" }}>{p}</span>)}
-          {hotel.con&&<span style={{ padding:"2px 8px", borderRadius:100, fontSize:10, fontWeight:600, background:"#FFF0F3", color:"#FF385C" }}>{hotel.con}</span>}
+          {(hotel.pros||[]).slice(0,2).map((p,i)=><span key={i} style={{ padding:"2px 8px", borderRadius:100, fontSize:12, fontWeight:600, background:"#EDFAEE", color:"#008A05" }}>{p}</span>)}
+          {hotel.con&&<span style={{ padding:"2px 8px", borderRadius:100, fontSize:12, fontWeight:600, background:"#FFF0F3", color:"#FF385C" }}>{hotel.con}</span>}
         </div>
-        {hotel.vibe&&<div style={{ fontSize:11, color:"#717171", fontStyle:"italic", marginTop:6 }}>"{hotel.vibe}"</div>}
+        {hotel.vibe&&<div style={{ fontSize:12, color:"#717171", fontStyle:"italic", marginTop:8 }}>"{hotel.vibe}"</div>}
       </div>
     </div>
   );
@@ -186,36 +186,36 @@ function HotelCompare({ hotels, cart, nightsN, onSelect, result, mobile }) {
   return (
     <div>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12, flexWrap:"wrap", gap:8 }}>
-        <span style={{ fontWeight:700, fontSize:15 }}>Comparar hoteles</span>
+        <span style={{ fontWeight:700, fontSize:16 }}>Comparar hoteles</span>
         <div style={{ display:"flex", gap:4 }}>
           {[{k:"price",l:"Precio"},{k:"stars",l:"Estrellas"}].map(s=>(
-            <button key={s.k} onClick={()=>setSort(s.k)} style={{ padding:"5px 12px", borderRadius:100, border:"none", fontSize:11, fontWeight:600, cursor:"pointer", fontFamily:"inherit", background:sort===s.k?"#222":"#F0F0F0", color:sort===s.k?"#fff":"#717171" }}>{s.l}</button>
+            <button key={s.k} onClick={()=>setSort(s.k)} style={{ padding:"4px 12px", borderRadius:100, border:"none", fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"inherit", background:sort===s.k?"#222":"#F0F0F0", color:sort===s.k?"#fff":"#717171" }}>{s.l}</button>
           ))}
         </div>
       </div>
-      <div style={{ display:"grid", gridTemplateColumns:mobile?"1fr":"1fr 1fr", gap:10 }}>
+      <div style={{ display:"grid", gridTemplateColumns:mobile?"1fr":"1fr 1fr", gap:8 }}>
         {sorted.map((h,i) => {
           const sel = cart.hotel?.name===h.name;
           return (
-            <div key={i} style={{ background:"#FFF", border:"2px solid "+(sel?"#008A05":"#DDD"), borderRadius:16, padding:"14px 16px", boxShadow:"0 2px 8px rgba(0,0,0,.08)" }}>
+            <div key={i} style={{ background:"#FFF", border:"2px solid "+(sel?"#008A05":"#DDD"), borderRadius:16, padding:"12px 16px", boxShadow:"0 2px 8px rgba(0,0,0,.08)" }}>
               <div style={{ display:"flex", justifyContent:"space-between", gap:8 }}>
                 <div style={{ flex:1 }}>
-                  <div style={{ display:"flex", gap:5, alignItems:"center", flexWrap:"wrap", marginBottom:4 }}>
+                  <div style={{ display:"flex", gap:8, alignItems:"center", flexWrap:"wrap", marginBottom:4 }}>
                     <span style={{ fontWeight:700, fontSize:14 }}>{h.name}</span>
-                    {h.verified&&<span style={{ fontSize:9, fontWeight:700, background:"#EDFAEE", color:"#008A05", padding:"1px 6px", borderRadius:100 }}>✓</span>}
+                    {h.verified&&<span style={{ fontSize:12, fontWeight:700, background:"#EDFAEE", color:"#008A05", padding:"2px 8px", borderRadius:100 }}>✓</span>}
                     {sel&&<Badge color="green">En cesta</Badge>}
                   </div>
-                  <div style={{ fontSize:11, color:"#717171" }}>{h.area} · {h.distance_center}</div>
-                  <div style={{ color:"#F5C518", fontSize:10, marginTop:4 }}>{"★".repeat(h.stars||3)}</div>
+                  <div style={{ fontSize:12, color:"#717171" }}>{h.area} · {h.distance_center}</div>
+                  <div style={{ color:"#F5C518", fontSize:12, marginTop:4 }}>{"★".repeat(h.stars||3)}</div>
                 </div>
                 <div style={{ textAlign:"right", flexShrink:0 }}>
-                  <div style={{ fontWeight:800, fontSize:18 }}>{h.price_per_night}€</div>
-                  <div style={{ fontSize:9, color:"#717171" }}>noche</div>
+                  <div style={{ fontWeight:800, fontSize:20 }}>{h.price_per_night}€</div>
+                  <div style={{ fontSize:12, color:"#717171" }}>noche</div>
                   <div style={{ fontWeight:600, fontSize:12, color:"#717171" }}>{h.price_per_night*nightsN}€ total</div>
                 </div>
               </div>
-              <div style={{ display:"flex", gap:5, marginTop:10 }}>
-                <button onClick={()=>onSelect(h)} style={{ flex:1, padding:"7px", borderRadius:10, border:"none", fontSize:11, fontWeight:700, cursor:"pointer", fontFamily:"inherit", background:sel?"#EDFAEE":"#222", color:sel?"#008A05":"#fff" }}>{sel?"Seleccionado":"Seleccionar"}</button>
+              <div style={{ display:"flex", gap:4, marginTop:8 }}>
+                <button onClick={()=>onSelect(h)} style={{ flex:1, padding:"8px", borderRadius:8, border:"none", fontSize:12, fontWeight:700, cursor:"pointer", fontFamily:"inherit", background:sel?"#EDFAEE":"#222", color:sel?"#008A05":"#fff" }}>{sel?"Seleccionado":"Seleccionar"}</button>
               </div>
               {sel && <LinkPills links={hotelLinks(result.destination, result.checkIn, result.checkOut, result.travelers)} />}
             </div>
@@ -350,9 +350,9 @@ function ItineraryTab({ itinerary }) {
         const isOpen = open===i;
         return (
           <div key={i} style={{ background:"#FFF", border:"1px solid "+(isOpen?"#222":"#DDD"), borderRadius:16, overflow:"hidden", boxShadow:"0 2px 8px rgba(0,0,0,.08)" }}>
-            <button onClick={()=>setOpen(isOpen?-1:i)} style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 16px", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", textAlign:"left" }}>
-              <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                <div style={{ width:30, height:30, borderRadius:"50%", background:isOpen?"#222":"#F0F0F0", color:isOpen?"#fff":"#222", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, fontSize:13, flexShrink:0 }}>{day.day}</div>
+            <button onClick={()=>setOpen(isOpen?-1:i)} style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"12px 16px", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", textAlign:"left" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+                <div style={{ width:32, height:32, borderRadius:"50%", background:isOpen?"#222":"#F0F0F0", color:isOpen?"#fff":"#222", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, fontSize:14, flexShrink:0 }}>{day.day}</div>
                 <span style={{ fontWeight:700, fontSize:14 }}>{day.title}</span>
               </div>
               <span style={{ fontSize:12, color:"#717171", transform:isOpen?"rotate(180deg)":"none", transition:"transform .2s", display:"inline-block" }}>▾</span>
@@ -365,9 +365,9 @@ function ItineraryTab({ itinerary }) {
                     <div key={p} style={{ display:"flex", gap:12, padding:"12px 16px", borderBottom:"1px solid #F7F7F7" }}>
                       <div style={{ fontSize:20, flexShrink:0, marginTop:1 }}>{PICON[p]}</div>
                       <div style={{ flex:1 }}>
-                        <div style={{ fontSize:10, fontWeight:700, color:"#717171", textTransform:"uppercase", letterSpacing:.4, marginBottom:3 }}>{PLBL[p]}</div>
-                        <div style={{ fontWeight:600, fontSize:13, marginBottom:d.tip?4:0 }}>{d.activity}</div>
-                        {d.tip&&<div style={{ fontSize:11, color:"#717171", background:"#F7F7F7", borderRadius:8, padding:"4px 10px", display:"inline-block" }}>💡 {d.tip}</div>}
+                        <div style={{ fontSize:12, fontWeight:700, color:"#717171", textTransform:"uppercase", letterSpacing:.4, marginBottom:4 }}>{PLBL[p]}</div>
+                        <div style={{ fontWeight:600, fontSize:14, marginBottom:d.tip?4:0 }}>{d.activity}</div>
+                        {d.tip&&<div style={{ fontSize:12, color:"#717171", background:"#F7F7F7", borderRadius:8, padding:"4px 8px", display:"inline-block" }}>💡 {d.tip}</div>}
                       </div>
                     </div>
                   );
@@ -387,33 +387,33 @@ function DiscoverTab({ result, cart, addExtra, mobile }) {
       <div style={{ fontSize:10, fontWeight:700, color:"#717171", textTransform:"uppercase", letterSpacing:.5, paddingLeft:2 }}>📖 Sobre el destino</div>
       <div style={{ display:"grid", gridTemplateColumns:mobile?"1fr":"1fr 1fr", gap:8 }}>
         {[{l:"Cuándo ir",t:result.best_time,icon:"🗓"},{l:"Qué evitar",t:result.skip_this,icon:"⚠️"}].map(c=>(
-          <div key={c.l} style={{ background:"#FFF", border:"1px solid #DDD", borderRadius:14, padding:"14px 16px", boxShadow:"0 2px 8px rgba(0,0,0,.08)" }}>
-            <div style={{ fontSize:10, fontWeight:700, color:"#717171", textTransform:"uppercase", letterSpacing:.5, marginBottom:6 }}>{c.icon} {c.l}</div>
-            <div style={{ fontSize:13, lineHeight:1.6 }}>{c.t}</div>
+          <div key={c.l} style={{ background:"#FFF", border:"1px solid #DDD", borderRadius:16, padding:"12px 16px", boxShadow:"0 2px 8px rgba(0,0,0,.08)" }}>
+            <div style={{ fontSize:12, fontWeight:700, color:"#717171", textTransform:"uppercase", letterSpacing:.5, marginBottom:8 }}>{c.icon} {c.l}</div>
+            <div style={{ fontSize:14, lineHeight:1.6 }}>{c.t}</div>
           </div>
         ))}
       </div>
       {result.hidden_gem&&(
-        <div style={{ background:"#FFF3E0", border:"1px solid rgba(201,106,0,.15)", borderRadius:14, padding:"14px 16px" }}>
-          <div style={{ fontSize:10, fontWeight:700, color:"#C96A00", textTransform:"uppercase", letterSpacing:.5, marginBottom:6 }}>✨ Joya oculta</div>
-          <div style={{ fontSize:13, lineHeight:1.6 }}>{result.hidden_gem}</div>
+        <div style={{ background:"#FFF3E0", border:"1px solid rgba(201,106,0,.15)", borderRadius:16, padding:"12px 16px" }}>
+          <div style={{ fontSize:12, fontWeight:700, color:"#C96A00", textTransform:"uppercase", letterSpacing:.5, marginBottom:8 }}>✨ Joya oculta</div>
+          <div style={{ fontSize:14, lineHeight:1.6 }}>{result.hidden_gem}</div>
         </div>
       )}
-      <div style={{ fontSize:10, fontWeight:700, color:"#717171", textTransform:"uppercase", letterSpacing:.5, paddingLeft:2, marginTop:4 }}>🎟 Actividades y restaurantes</div>
+      <div style={{ fontSize:12, fontWeight:700, color:"#717171", textTransform:"uppercase", letterSpacing:.5, paddingLeft:4, marginTop:4 }}>🎟 Actividades y restaurantes</div>
       {result.recs?.length > 0 && (
         <div style={{ background:"#FFF", border:"1px solid #DDD", borderRadius:14, overflow:"hidden", boxShadow:"0 2px 8px rgba(0,0,0,.08)" }}>
           {result.recs.map((r,i) => {
             const inC = cart.extras.find(e=>e.name===r.name);
             return (
               <div key={i}>
-                <div style={{ padding:"10px 14px", display:"flex", alignItems:"center", gap:8, flexWrap:"wrap" }}>
+                <div style={{ padding:"8px 16px", display:"flex", alignItems:"center", gap:8, flexWrap:"wrap" }}>
                   <div style={{ flex:1, minWidth:110 }}>
-                    <div style={{ fontWeight:600, fontSize:12 }}>{r.name}</div>
-                    <div style={{ fontSize:10, color:"#717171" }}>{r.type}</div>
+                    <div style={{ fontWeight:600, fontSize:14 }}>{r.name}</div>
+                    <div style={{ fontSize:12, color:"#717171" }}>{r.type}</div>
                   </div>
-                  <div style={{ display:"flex", alignItems:"center", gap:5, flexShrink:0 }}>
-                    <span style={{ fontWeight:700, fontSize:12, color:r.price_pp===0?"#008A05":undefined }}>{r.price_pp===0?"Gratis":"~"+r.price_pp+"€"}</span>
-                    <button onClick={()=>!inC&&addExtra(r)} style={{ padding:"4px 8px", borderRadius:8, fontSize:10, fontWeight:700, border:"none", cursor:inC?"default":"pointer", fontFamily:"inherit", background:inC?"#EDFAEE":"#FF385C", color:inC?"#008A05":"#fff" }}>{inC?"✓":"+"}</button>
+                  <div style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
+                    <span style={{ fontWeight:700, fontSize:14, color:r.price_pp===0?"#008A05":undefined }}>{r.price_pp===0?"Gratis":"~"+r.price_pp+"€"}</span>
+                    <button onClick={()=>!inC&&addExtra(r)} style={{ padding:"4px 8px", borderRadius:8, fontSize:12, fontWeight:700, border:"none", cursor:inC?"default":"pointer", fontFamily:"inherit", background:inC?"#EDFAEE":"#FF385C", color:inC?"#008A05":"#fff" }}>{inC?"✓":"+"}</button>
                   </div>
                 </div>
                 {i<result.recs.length-1&&<div style={{ height:1, background:"#DDD" }}/>}
@@ -478,7 +478,7 @@ function ShareModal({ result, cart, nightsN, cartSpent, onClose }) {
       <div onClick={onClose} style={{ position:"absolute", inset:0, background:"rgba(0,0,0,.4)" }}/>
       <div style={{ position:"relative", width:"100%", background:"#FFF", borderRadius:"20px 20px 0 0", padding:"24px 20px 40px" }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
-          <span style={{ fontWeight:800, fontSize:17 }}>Compartir plan</span>
+          <span style={{ fontWeight:800, fontSize:16 }}>Compartir plan</span>
           <button onClick={onClose} style={{ background:"#F0F0F0", border:"none", borderRadius:"50%", width:32, height:32, cursor:"pointer", fontSize:16 }}>×</button>
         </div>
         <pre style={{ background:"#F7F7F7", borderRadius:12, padding:"12px 14px", fontSize:12, lineHeight:1.7, whiteSpace:"pre-wrap", wordBreak:"break-word", border:"1px solid #DDD", maxHeight:200, overflowY:"auto", fontFamily:"monospace" }}>{txt}</pre>
@@ -515,10 +515,10 @@ function CartDrawer({ cart, result, budget, nightsN, onRemove, onClose, mobile }
       <div onClick={onClose} style={{ position:"absolute", inset:0, background:"rgba(0,0,0,.4)" }}/>
       <div style={{ position:"relative", width:"100%", maxHeight:"80vh", overflowY:"auto", background:"#FFF", borderRadius:"20px 20px 0 0", padding:mobile?"20px 16px 32px":"24px 32px 40px" }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:18 }}>
-          <span style={{ fontWeight:800, fontSize:18 }}>Tu cesta</span>
+          <span style={{ fontWeight:800, fontSize:20 }}>Tu cesta</span>
           <button onClick={onClose} style={{ background:"#F0F0F0", border:"none", borderRadius:"50%", width:32, height:32, cursor:"pointer", fontSize:16 }}>×</button>
         </div>
-        {empty&&<div style={{ textAlign:"center", padding:"24px 0", color:"#717171", fontSize:13 }}>Todavía no has guardado nada.<br/>Selecciona hotel y transporte en las tabs.</div>}
+        {empty&&<div style={{ textAlign:"center", padding:"24px 0", color:"#717171", fontSize:14 }}>Todavía no has guardado nada.<br/>Selecciona hotel y transporte en las tabs.</div>}
         {cart.hotel&&<CartRow label="🏨 Alojamiento" name={cart.hotel.name} detail={cart.hotel.price_per_night+"€/n × "+nightsN} total={hT} onRemove={()=>onRemove("hotel")}/>}
         {cart.transport&&<CartRow label={TI[cart.transport.type]+" Transporte"} name={cart.transport.label} detail={cart.transport.price_pp+"€/p × "+(result?.travelers||1)} total={tT} onRemove={()=>onRemove("transport")}/>}
         {(cart.extras||[]).map((e,i)=><CartRow key={i} label="🎟 Extra" name={e.name} detail={(e.price_pp||0)+"€/p × "+(result?.travelers||1)} total={(e.price_pp||0)*(result?.travelers||1)} onRemove={()=>onRemove("extra",i)}/>)}
@@ -537,23 +537,23 @@ function CartDrawer({ cart, result, budget, nightsN, onRemove, onClose, mobile }
 }
 function CartRow({ label, name, detail, total, onRemove }) {
   return (
-    <div style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 0", borderBottom:"1px solid #F0F0F0" }}>
+    <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 0", borderBottom:"1px solid #F0F0F0" }}>
       <div style={{ flex:1 }}>
-        <div style={{ fontSize:10, fontWeight:700, color:"#717171", textTransform:"uppercase" }}>{label}</div>
-        <div style={{ fontWeight:600, fontSize:13 }}>{name}</div>
-        <div style={{ fontSize:11, color:"#717171" }}>{detail}</div>
+        <div style={{ fontSize:12, fontWeight:700, color:"#717171", textTransform:"uppercase" }}>{label}</div>
+        <div style={{ fontWeight:600, fontSize:14 }}>{name}</div>
+        <div style={{ fontSize:12, color:"#717171" }}>{detail}</div>
       </div>
-      <div style={{ fontWeight:800, fontSize:15 }}>{total}€</div>
-      <button onClick={onRemove} style={{ background:"#FFF0F3", border:"none", borderRadius:8, width:28, height:28, cursor:"pointer", color:"#FF385C", fontWeight:700, fontSize:14, display:"flex", alignItems:"center", justifyContent:"center" }}>×</button>
+      <div style={{ fontWeight:800, fontSize:16 }}>{total}€</div>
+      <button onClick={onRemove} style={{ background:"#FFF0F3", border:"none", borderRadius:8, width:32, height:32, cursor:"pointer", color:"#FF385C", fontWeight:700, fontSize:16, display:"flex", alignItems:"center", justifyContent:"center" }}>×</button>
     </div>
   );
 }
 function BudgetLine({ label, detail, amount, total }) {
   return (
-    <div style={{ display:"flex", alignItems:"center", gap:10, padding:"11px 16px", borderBottom:"1px solid #F0F0F0" }}>
-      <div style={{ flex:1 }}><div style={{ fontSize:11, fontWeight:700 }}>{label}</div><div style={{ fontSize:10, color:"#717171" }}>{detail}</div></div>
+    <div style={{ display:"flex", alignItems:"center", gap:8, padding:"12px 16px", borderBottom:"1px solid #F0F0F0" }}>
+      <div style={{ flex:1 }}><div style={{ fontSize:12, fontWeight:700 }}>{label}</div><div style={{ fontSize:12, color:"#717171" }}>{detail}</div></div>
       <div style={{ fontWeight:700, fontSize:14 }}>{amount}€</div>
-      {total>0&&<div style={{ fontSize:10, color:"#717171", minWidth:32, textAlign:"right" }}>{pct(amount,total)}%</div>}
+      {total>0&&<div style={{ fontSize:12, color:"#717171", minWidth:32, textAlign:"right" }}>{pct(amount,total)}%</div>}
     </div>
   );
 }
@@ -603,7 +603,7 @@ export default function App() {
   const cartET = (cart.extras||[]).reduce((s,e)=>s+(e.price_pp||0)*(result?.travelers||1),0);
   const cartSpent = cartHT+cartTT+cartET;
 
-  const addExtra = item => { if(cart.extras.find(e=>e.name===item.name)) return; setCart(c=>({...c,extras:[...c.extras,item]})); toast("✓ "+item.name+" añadido","#008A05"); };
+  const addExtra = item => { if(cart.extras.find(e=>e.name===item.name)) return; setCart(c=>({...c,extras:[...c.extras,item]})); };
   const removeFromCart = (type,idx) => { if(type==="hotel") setCart(c=>({...c,hotel:null})); else if(type==="transport") setCart(c=>({...c,transport:null})); else setCart(c=>({...c,extras:c.extras.filter((_,i)=>i!==idx)})); };
   const restoreSaved = () => { setResult(savedResult); setBudget(savedResult?.budget||""); setHotelIdx(0); setHotelHistory([]); setCart({hotel:null,transport:null,extras:[]}); setHeroUrl(""); setHotelView("swipe"); setTab("hotels"); setSelDateWindow(null); window.storage.get(SC).then(r=>{if(r?.value)setCart(JSON.parse(r.value));}).catch(()=>{}); setScreen("results"); };
 
@@ -844,7 +844,6 @@ SOLO JSON: {"suggestions":[{"destination":"Ciudad, País","tagline":"frase corta
   if (screen!=="results"||!result) return null;
   const hotelsDone = hotelIdx>=(result.hotels?.length||0);
   const fc = result.budget_analysis?.feasibility;
-  const tabBtn = (k,l) => <button key={k} onClick={()=>setTab(k)} style={{ padding:"7px 2px", borderRadius:10, border:"none", background:tab===k?"#222":"transparent", color:tab===k?"#fff":"#717171", fontWeight:600, fontSize:mobile?9:11, cursor:"pointer", fontFamily:"inherit" }}>{l}</button>;
 
   return (
     <div style={{ minHeight:"100vh", background:"#F7F7F7", paddingBottom:70, fontFamily:"system-ui,sans-serif" }}>
@@ -856,46 +855,47 @@ SOLO JSON: {"suggestions":[{"destination":"Ciudad, País","tagline":"frase corta
           <button onClick={()=>setScreen("form")} style={{ background:"none", border:"1px solid #DDD", borderRadius:100, padding:"6px 12px", fontWeight:600, fontSize:11, cursor:"pointer", fontFamily:"inherit" }}>Nueva</button>
         </div>
       </nav>
-      <div style={{ position:"relative", height:mobile?"35vh":"50vh", minHeight:250, maxHeight:450, background:"#ccc", overflow:"hidden" }}>
+      <div style={{ position:"relative", height:mobile?"24vh":"50vh", minHeight:180, maxHeight:450, background:"#ccc", overflow:"hidden" }}>
         {heroUrl&&<img src={heroUrl} alt={result.destination} style={{ width:"100%", height:"100%", objectFit:"cover" }}/>}
         <div style={{ position:"absolute", inset:0, background:"linear-gradient(to bottom,rgba(0,0,0,.05),rgba(0,0,0,.65))" }}/>
-        <div style={{ position:"absolute", bottom:0, left:0, right:0, padding:mobile?"0 18px 20px":"0 40px 32px" }}>
+        <div style={{ position:"absolute", bottom:0, left:0, right:0, padding:mobile?"0 16px 16px":"0 32px 32px" }}>
           <div style={{ maxWidth:720, margin:"0 auto", color:"#fff" }}>
-            <div style={{ display:"inline-flex", alignItems:"center", gap:6, background:"rgba(255,255,255,.15)", backdropFilter:"blur(8px)", borderRadius:100, padding:"4px 12px 4px 4px", marginBottom:10 }}>
-              <div style={{ width:28, height:28, borderRadius:14, background:result.score>=7?"#008A05":"#FF385C", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, fontSize:13 }}>{result.score}</div>
-              <span style={{ fontWeight:600, fontSize:12 }}>{result.score>=8?"Muy recomendable":result.score>=6?"Vale la pena":"Con matices"}</span>
+            <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(255,255,255,.15)", backdropFilter:"blur(8px)", borderRadius:100, padding:"4px 8px", marginBottom:8 }}>
+              <div style={{ width:28, height:28, borderRadius:16, background:result.score>=7?"#008A05":"#FF385C", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, fontSize:14 }}>{result.score}</div>
             </div>
-            <h1 style={{ fontSize:mobile?28:42, fontWeight:800, lineHeight:1.1, marginBottom:6 }}>{result.destination}</h1>
-            <p style={{ fontSize:mobile?12:14, lineHeight:1.6, opacity:.9, maxWidth:500 }}>{result.honest_take}</p>
+            <h1 style={{ fontSize:mobile?24:42, fontWeight:800, lineHeight:1.1, marginBottom:4 }}>{result.destination}</h1>
+            <p style={{ fontSize:14, lineHeight:1.6, opacity:.9, maxWidth:500 }}>{result.honest_take}</p>
           </div>
         </div>
       </div>
       <div style={{ maxWidth:760, margin:"0 auto", padding:mobile?"14px 14px 0":"24px 24px 0" }}>
-        {result.budget&&(
-          <div style={{ background:"#FFF", borderRadius:14, padding:"12px 16px", marginBottom:10, display:"flex", alignItems:"center", gap:10, border:"1px solid #DDD", boxShadow:"0 2px 8px rgba(0,0,0,.08)", flexWrap:"wrap" }}>
-            <div style={{ flex:1, minWidth:150 }}><div style={{ fontWeight:600, fontSize:13 }}>{result.budget_analysis?.verdict}</div>{result.budget_analysis?.alternative&&<div style={{ fontSize:11, color:"#717171", marginTop:2 }}>{result.budget_analysis.alternative}</div>}</div>
-            <Badge color={fc==="ok"?"green":fc==="tight"?"amber":"red"}>{fc==="ok"?"OK":fc==="tight"?"Justo":"Insuficiente"}</Badge>
+        <div style={{ background:"#FFF", border:"1px solid #DDD", borderRadius:12, marginBottom:12, overflow:"hidden", boxShadow:"0 2px 8px rgba(0,0,0,.08)" }}>
+          <div style={{ height:32, display:"flex", alignItems:"center", gap:8, padding:"0 16px", borderBottom:"1px solid #F0F0F0", overflowX:"auto" }}>
+            <span style={{ fontSize:12, color:"#717171", whiteSpace:"nowrap" }}>⭐ {result.score}/10</span>
+            {(result.checkIn||selDateWindow?.start)&&<><span style={{color:"#DDD",flexShrink:0}}>·</span><span style={{ fontSize:12, color:"#717171", whiteSpace:"nowrap" }}>{result.checkIn||selDateWindow?.start} → {result.checkOut||selDateWindow?.end}</span></>}
+            <span style={{color:"#DDD",flexShrink:0}}>·</span>
+            <span style={{ fontSize:12, color:"#717171", whiteSpace:"nowrap" }}>👥 {result.travelers}</span>
+            {result.budget&&<><span style={{color:"#DDD",flexShrink:0}}>·</span><span style={{ fontSize:12, color:"#717171", whiteSpace:"nowrap" }}>💰 {result.budget}€</span></>}
+            {result.budget&&<><span style={{color:"#DDD",flexShrink:0}}>·</span><span style={{ fontSize:12, whiteSpace:"nowrap", fontWeight:600, color:fc==="ok"?"#008A05":fc==="tight"?"#C96A00":"#FF385C" }}>{fc==="ok"?"OK":fc==="tight"?"Justo":"Insuficiente"}</span></>}
           </div>
-        )}
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", background:"#F7F7F7" }}>
+            {[["hotels","🏨 Hotel"],["transport","✈️ Ruta"],["itinerary","📅 Plan"],["budget","💰 Budget"],["discover","🔍 Discover"]].map(([k,l])=>(
+              <button key={k} onClick={()=>setTab(k)} style={{ height:40, border:"none", background:tab===k?"#222":"transparent", color:tab===k?"#fff":"#717171", fontWeight:600, fontSize:12, cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", justifyContent:"center", gap:4, padding:"0 4px" }}>{l}</button>
+            ))}
+          </div>
+        </div>
         {result.flexDates&&result.date_windows?.length>0&&(
           <DateWindowPicker windows={result.date_windows} selected={selDateWindow} onSelect={setSelDateWindow}/>
         )}
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:2, background:"#FFF", border:"1px solid #DDD", borderRadius:14, padding:3, marginBottom:12, boxShadow:"0 2px 8px rgba(0,0,0,.08)" }}>
-          {tabBtn("hotels","🏨 Hotel")}
-          {tabBtn("transport","✈️ Ruta")}
-          {tabBtn("itinerary","📅 Plan")}
-          {tabBtn("budget","💰 Budget")}
-          {tabBtn("discover","🔍 Discover")}
-        </div>
 
         {tab==="hotels"&&(
           <div>
             {cart.hotel&&(
               <div style={{ background:"#EDFAEE", border:"1px solid rgba(0,138,5,.2)", borderRadius:14, padding:"10px 14px", marginBottom:10, display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:8, flexWrap:"wrap" }}>
                 <div>
-                  <div style={{ fontSize:10, fontWeight:700, color:"#008A05" }}>EN CESTA</div>
-                  <div style={{ fontWeight:700, fontSize:13 }}>{cart.hotel.name}</div>
-                  <div style={{ fontSize:11, color:"#717171" }}>{cart.hotel.price_per_night}€/n × {nightsN} = <b>{cart.hotel.price_per_night*nightsN}€</b></div>
+                  <div style={{ fontSize:12, fontWeight:700, color:"#008A05" }}>EN CESTA</div>
+                  <div style={{ fontWeight:700, fontSize:14 }}>{cart.hotel.name}</div>
+                  <div style={{ fontSize:12, color:"#717171" }}>{cart.hotel.price_per_night}€/n × {nightsN} = <b>{cart.hotel.price_per_night*nightsN}€</b></div>
                   <LinkPills links={hotelLinks(result.destination, result.checkIn||selDateWindow?.start, result.checkOut||selDateWindow?.end, result.travelers)}/>
                 </div>
                 <button onClick={()=>{setCart(c=>({...c,hotel:null}));setHotelIdx(0);setHotelHistory([]);setHotelView("swipe");}} style={{ padding:"6px 10px", border:"1px solid #DDD", borderRadius:10, fontSize:10, fontWeight:600, cursor:"pointer", background:"none", fontFamily:"inherit", flexShrink:0 }}>Cambiar</button>
@@ -938,8 +938,8 @@ SOLO JSON: {"suggestions":[{"destination":"Ciudad, País","tagline":"frase corta
                 ) : null}
               </>
             )}
-            {hotelView==="compare"&&<HotelCompare hotels={result.hotels} cart={cart} nightsN={nightsN} onSelect={h=>{const sel=cart.hotel?.name===h.name;setCart(c=>({...c,hotel:sel?null:h}));if(!sel)toast("♥ "+h.name+" guardado","#008A05");}} result={result} mobile={mobile}/>}
-            {hotelView==="mapa"&&<HotelMap hotels={result.hotels} cart={cart} onSelect={h=>{const sel=cart.hotel?.name===h.name;setCart(c=>({...c,hotel:sel?null:h}));if(!sel)toast("♥ "+h.name+" guardado","#008A05");}} mobile={mobile}/>}
+            {hotelView==="compare"&&<HotelCompare hotels={result.hotels} cart={cart} nightsN={nightsN} onSelect={h=>{const sel=cart.hotel?.name===h.name;setCart(c=>({...c,hotel:sel?null:h}));}} result={result} mobile={mobile}/>}
+            {hotelView==="mapa"&&<HotelMap hotels={result.hotels} cart={cart} onSelect={h=>{const sel=cart.hotel?.name===h.name;setCart(c=>({...c,hotel:sel?null:h}));}} mobile={mobile}/>}
           </div>
         )}
 
@@ -950,20 +950,20 @@ SOLO JSON: {"suggestions":[{"destination":"Ciudad, País","tagline":"frase corta
               const tLinks = getTransportLinks(t.type, result.origin, result.destination, result.checkIn||selDateWindow?.start, result.travelers);
               return (
                 <div key={i} style={{ background:"#FFF", border:"2px solid "+(sel?"#222":"#DDD"), borderRadius:14, padding:"14px 16px", cursor:"pointer", boxShadow:"0 2px 8px rgba(0,0,0,.08)" }}>
-                  <div onClick={()=>{const was=sel;setCart(c=>({...c,transport:was?null:{...t}}));if(!was)toast((TI[t.type]||"🚗")+" "+t.label+" añadido","#222");}} style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:10, flexWrap:"wrap" }}>
+                  <div onClick={()=>{const was=sel;setCart(c=>({...c,transport:was?null:{...t}}));}} style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:10, flexWrap:"wrap" }}>
                     <div style={{ flex:1, minWidth:140 }}>
                       <div style={{ display:"flex", gap:8, alignItems:"center", marginBottom:4, flexWrap:"wrap" }}>
-                        <span style={{ fontSize:18 }}>{TI[t.type]||"🚗"}</span>
+                        <span style={{ fontSize:20 }}>{TI[t.type]||"🚗"}</span>
                         <span style={{ fontWeight:700, fontSize:14 }}>{t.label}</span>
                         {t.duration&&<Badge color="gray">{t.duration}</Badge>}
                         {sel&&<Badge color="green">En cesta</Badge>}
                       </div>
-                      <div style={{ fontSize:11, color:"#717171", background:"#F7F7F7", borderRadius:8, padding:"5px 10px", display:"inline-block" }}>{t.tip}</div>
+                      <div style={{ fontSize:12, color:"#717171", background:"#F7F7F7", borderRadius:8, padding:"4px 8px", display:"inline-block" }}>{t.tip}</div>
                     </div>
                     <div style={{ textAlign:"right", flexShrink:0 }}>
                       <div style={{ fontWeight:800, fontSize:20 }}>{t.price_pp}€</div>
-                      <div style={{ fontSize:10, color:"#717171" }}>por persona</div>
-                      {result.travelers>1&&<div style={{ fontWeight:700, fontSize:12, marginTop:1 }}>{t.price_pp*result.travelers}€ total</div>}
+                      <div style={{ fontSize:12, color:"#717171" }}>por persona</div>
+                      {result.travelers>1&&<div style={{ fontWeight:700, fontSize:12, marginTop:4 }}>{t.price_pp*result.travelers}€ total</div>}
                     </div>
                   </div>
                   {sel&&<LinkPills links={tLinks}/>}
@@ -984,12 +984,12 @@ SOLO JSON: {"suggestions":[{"destination":"Ciudad, País","tagline":"frase corta
               {total>0&&(
                 <div style={{ background:"#FFF", border:"1px solid #DDD", borderRadius:14, overflow:"hidden", boxShadow:"0 2px 8px rgba(0,0,0,.08)" }}>
                   <div style={{ padding:"14px 16px" }}>
-                    <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}><span style={{ fontWeight:700, fontSize:14 }}>Presupuesto</span><span style={{ fontWeight:800, fontSize:17 }}>{total}€</span></div>
+                    <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}><span style={{ fontWeight:700, fontSize:14 }}>Presupuesto</span><span style={{ fontWeight:800, fontSize:16 }}>{total}€</span></div>
                     <Bar value={pct(cartSpent,total)} color={pct(cartSpent,total)>90?"#FF385C":"#008A05"}/>
                     <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", marginTop:12 }}>
-                      <div><div style={{ fontWeight:700, fontSize:15 }}>{cartSpent}€</div><div style={{ fontSize:10, color:"#717171" }}>Comprometido</div></div>
-                      <div style={{ textAlign:"center" }}><div style={{ fontWeight:700, fontSize:15, color:free<=0?"#FF385C":"#008A05" }}>{free}€</div><div style={{ fontSize:10, color:"#717171" }}>Libre</div></div>
-                      <div style={{ textAlign:"right" }}><div style={{ fontWeight:700, fontSize:15 }}>{perDay>0?perDay+"€":"—"}</div><div style={{ fontSize:10, color:"#717171" }}>Por día</div></div>
+                      <div><div style={{ fontWeight:700, fontSize:16 }}>{cartSpent}€</div><div style={{ fontSize:12, color:"#717171" }}>Comprometido</div></div>
+                      <div style={{ textAlign:"center" }}><div style={{ fontWeight:700, fontSize:16, color:free<=0?"#FF385C":"#008A05" }}>{free}€</div><div style={{ fontSize:12, color:"#717171" }}>Libre</div></div>
+                      <div style={{ textAlign:"right" }}><div style={{ fontWeight:700, fontSize:16 }}>{perDay>0?perDay+"€":"—"}</div><div style={{ fontSize:12, color:"#717171" }}>Por día</div></div>
                     </div>
                   </div>
                 </div>
@@ -998,7 +998,7 @@ SOLO JSON: {"suggestions":[{"destination":"Ciudad, País","tagline":"frase corta
                 {cart.hotel&&<BudgetLine label="🏨 Alojamiento" detail={cart.hotel.name} amount={cartHT} total={total}/>}
                 {cart.transport&&<BudgetLine label={(TI[cart.transport.type]||"🚗")+" Transporte"} detail={cart.transport.label} amount={cartTT} total={total}/>}
                 {(cart.extras||[]).map((e,i)=><BudgetLine key={i} label="🎟 Extra" detail={e.name} amount={(e.price_pp||0)*(result.travelers||1)} total={total}/>)}
-                <div style={{ padding:"12px 16px", display:"flex", justifyContent:"space-between", fontWeight:800, fontSize:15, background:"#F7F7F7" }}><span>Total</span><span>{cartSpent}€</span></div>
+                <div style={{ padding:"12px 16px", display:"flex", justifyContent:"space-between", fontWeight:800, fontSize:16, background:"#F7F7F7" }}><span>Total</span><span>{cartSpent}€</span></div>
               </div>
             </div>
           );
