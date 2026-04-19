@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
 const STYLES_LIST = ["Cultura","Gastronomía","Aventura","Relax","Fiesta","Naturaleza","Budget"];
-const LOAD_STEPS = ["Analizando destino","Buscando hoteles reales","Comparando transporte","Generando itinerario","Preparando tu plan"];
 const INSPIRE_STEPS = ["Procesando tu perfil","Buscando destinos","Calculando presupuestos","Comparando opciones"];
+const SUBTITLES = ["Comparando hoteles sin filtros de Instagram...","Preguntando a los locales qué sitios evitar...","Calculando si tu presupuesto es realista...","Buscando el hotel que tu cuñado no conoce...","Descartando trampas para turistas...","Midiendo distancias reales, no las de Google...","Leyendo reviews de gente que no cobra por escribirlas...","Consultando con guías que viven allí..."];
+const FALLBACK_CURIOSITIES = ["Buscando los mejores rincones...","Comparando precios reales...","Analizando hoteles verificados..."];
 const TI = { flight:"✈️", train:"🚄", bus:"🚌", ferry:"⛴️" };
 const TL = { flight:"Vuelo", train:"Tren", bus:"Autobús", ferry:"Ferry" };
 const PICON = { morning:"🌅", afternoon:"☀️", evening:"🌙" };
@@ -568,6 +569,11 @@ export default function App() {
   const [savedResult, setSavedResult] = useState(null);
   const [form, setForm] = useState({ destination:"", origin:"", checkIn:"", checkOut:"", nights:7, budget:"", travelers:2, style:[], flexDates:false });
   const [loadStep, setLoadStep] = useState(0);
+  const [curiosities, setCuriosities] = useState([]);
+  const [curiIdx, setCuriIdx] = useState(0);
+  const [curiVisible, setCuriVisible] = useState(true);
+  const [subIdx, setSubIdx] = useState(0);
+  const [loadProgress, setLoadProgress] = useState(0);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [tab, setTab] = useState("hotels");
@@ -585,10 +591,30 @@ export default function App() {
 
   const dragStartRef = useRef(null);
   const isDragging = useRef(false);
+  const navigatedRef = useRef(false);
 
   useEffect(() => { window.storage.get(SR).then(r=>{ if(r?.value) setSavedResult(JSON.parse(r.value)); }).catch(()=>{}); }, []);
   useEffect(() => { if(result) window.storage.set(SR, JSON.stringify(result)).catch(()=>{}); }, [result]);
   useEffect(() => { window.storage.set(SC, JSON.stringify(cart)).catch(()=>{}); }, [cart]);
+
+  useEffect(() => {
+    if (screen !== "loading") { setLoadProgress(0); return; }
+    const t = setTimeout(() => setLoadProgress(90), 50);
+    return () => clearTimeout(t);
+  }, [screen]);
+  useEffect(() => {
+    if (screen !== "loading") return;
+    const iv = setInterval(() => setSubIdx(i => (i+1) % SUBTITLES.length), 3000);
+    return () => clearInterval(iv);
+  }, [screen]);
+  useEffect(() => {
+    if (screen !== "loading") return;
+    const iv = setInterval(() => {
+      setCuriVisible(false);
+      setTimeout(() => { setCuriIdx(i => (i+1) % (curiosities.length || FALLBACK_CURIOSITIES.length)); setCuriVisible(true); }, 400);
+    }, 4000);
+    return () => clearInterval(iv);
+  }, [screen, curiosities.length]);
 
   useEffect(() => {
     if (screen!=="results"||!result?.destination) return;
@@ -611,37 +637,72 @@ export default function App() {
   function onDragMove(cx) { if(!isDragging.current||dragStartRef.current===null) return; setDragX(cx-dragStartRef.current); }
   function onDragEnd() { if(!isDragging.current) return; isDragging.current=false; if(Math.abs(dragX)>70) doSwipe(dragX>0?"right":"left"); setDragX(0); dragStartRef.current=null; }
 
-  async function callAPI(prompt, steps, onStep) {
-    const si = setInterval(()=>onStep(s=>Math.min(s+1,steps.length-1)), 2800);
-    const res = await fetch("/api/anthropic", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-5",
-        max_tokens: 4096,
-        system: "Eres un planificador de viajes experto. IMPORTANTE: Responde ÚNICA Y EXCLUSIVAMENTE con un objeto JSON válido. No escribas texto antes ni después del JSON. No uses bloques de código markdown. Empieza directamente con { y termina con }.",
-        messages: [{ role:"user", content:prompt }]
-      })
-    });
-    clearInterval(si);
-    if(!res.ok) { const e=await res.json().catch(()=>({})); throw new Error(e?.error?.message||"Error "+res.status); }
-    const data = await res.json();
-    const textBlocks = (data.content||[]).filter(i=>i.type==="text").map(i=>i.text||"").filter(Boolean);
-    if(!textBlocks.length) throw new Error("Respuesta vacía del modelo");
-    for (const block of [...textBlocks].reverse()) {
-      try { const r = extractJSON(block); if(r && typeof r==="object") return r; } catch {}
+  async function callAPI(prompt, onPartial = null) {
+    const SYS = "Eres un planificador de viajes experto. IMPORTANTE: Responde ÚNICA Y EXCLUSIVAMENTE con un objeto JSON válido. No escribas texto antes ni después del JSON. No uses bloques de código markdown. Empieza directamente con { y termina con }.";
+    const BASE_BODY = { model:"claude-sonnet-4-5", max_tokens:4096, system:SYS, messages:[{role:"user",content:prompt}] };
+    try {
+      const res = await fetch("/api/anthropic", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({...BASE_BODY, stream:true})
+      });
+      if (!res.ok) { const e=await res.json().catch(()=>({})); throw new Error(e?.error?.message||"Error "+res.status); }
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf="", accumulated="", lastPartial=0;
+      while (true) {
+        const {done, value} = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, {stream:true});
+        const lines = buf.split("\n"); buf = lines.pop();
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const raw = line.slice(6).trim();
+          if (!raw || raw==="[DONE]") continue;
+          try {
+            const evt = JSON.parse(raw);
+            if (evt.type==="content_block_delta" && evt.delta?.type==="text_delta") accumulated += evt.delta.text;
+          } catch {}
+          const now = Date.now();
+          if (onPartial && now-lastPartial > 500) {
+            lastPartial = now;
+            try { const p=extractJSON(accumulated); if(p?.hotels?.[0]?.name) onPartial(p); } catch {}
+          }
+        }
+      }
+      try { const r=extractJSON(accumulated); if(r&&typeof r==="object") return r; } catch {}
+      throw new Error("No se pudo leer la respuesta");
+    } catch(streamErr) {
+      if (String(streamErr.message).startsWith("Error ")) throw streamErr;
+      const res2 = await fetch("/api/anthropic", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify(BASE_BODY)
+      });
+      if (!res2.ok) { const e=await res2.json().catch(()=>({})); throw new Error(e?.error?.message||"Error "+res2.status); }
+      const data = await res2.json();
+      const blocks = (data.content||[]).filter(i=>i.type==="text").map(i=>i.text||"").filter(Boolean);
+      if (!blocks.length) throw new Error("Respuesta vacía del modelo");
+      for (const b of [...blocks].reverse()) { try { const r=extractJSON(b); if(r&&typeof r==="object") return r; } catch {} }
+      try { return extractJSON(blocks.join("\n")); } catch {}
+      throw new Error("No se pudo leer la respuesta");
     }
-    try { return extractJSON(textBlocks.join("\n")); } catch {}
-    throw new Error("No se pudo leer la respuesta");
   }
 
   async function submit() {
     if(!form.destination.trim()) return;
-    setScreen("loading"); setError(null); setResult(null); setLoadStep(0);
+    setScreen("loading"); setError(null); setResult(null);
+    setCuriosities([]); setCuriIdx(0); setCuriVisible(true); setSubIdx(0); setLoadProgress(0);
     setHotelIdx(0); setHotelHistory([]); setCart({hotel:null,transport:null,extras:[]}); setHeroUrl(""); setHotelView("swipe"); setTab("hotels"); setDragX(0); setSelDateWindow(null);
+    navigatedRef.current = false;
     const n = form.flexDates ? form.nights : Math.max(1, calcNights(form.checkIn, form.checkOut)) || 7;
+
+    const curiPromise = fetch("/api/anthropic", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ model:"claude-haiku-4-5-20251001", max_tokens:400, system:"Responde ÚNICAMENTE con JSON válido.", messages:[{role:"user",content:`5 curiosidades sorprendentes sobre ${form.destination}, una frase cada una. SOLO JSON: {"curiosities":["frase1","frase2","frase3","frase4","frase5"]}`}] })
+    }).then(r=>r.json()).then(d=>{
+      const text=(d.content||[]).filter(i=>i.type==="text").map(i=>i.text||"").join("");
+      const j=extractJSON(text); if(j?.curiosities?.length) setCuriosities(j.curiosities);
+    }).catch(()=>{});
+
     const prompt = `Planifica un viaje a ${form.destination} desde ${form.origin||"España"}.
 Duración: ${n} noches. Viajeros: ${form.travelers}. Presupuesto: ${form.budget||"sin límite"}€. Estilo: ${form.style.join(", ")||"general"}.
 
@@ -667,30 +728,49 @@ Devuelve SOLO este JSON, sin texto adicional, sin markdown:
   "best_time": "mejor época"
 }
 Incluye 5 hoteles reales, 2-3 transportes, ${n} días de itinerario y 5 recomendaciones. Empieza con { directamente.`;
-    try {
-      const parsed = await callAPI(prompt, LOAD_STEPS, setLoadStep);
-      if(!parsed||typeof parsed!=="object") throw new Error("Respuesta inválida");
-      parsed.hotels = parsed.hotels||[];
-      parsed.transport_options = parsed.transport_options||[];
-      parsed.daily_itinerary = parsed.daily_itinerary||[];
-      parsed.recs = parsed.recs||[];
-      parsed.date_windows = parsed.date_windows||[];
-      const full = {...parsed,...form};
-      setResult(full); setBudget(form.budget||""); setSavedResult(full); setScreen("results");
-    } catch(e) { setError(e.message||"Error desconocido"); setScreen("form"); }
+
+    const onPartial = (partial) => {
+      if (navigatedRef.current) return;
+      if (partial?.score != null && partial?.hotels?.[0]?.name) {
+        navigatedRef.current = true;
+        setResult({...partial,...form}); setBudget(form.budget||""); setScreen("results");
+      }
+    };
+
+    const [, mainRes] = await Promise.allSettled([curiPromise, callAPI(prompt, onPartial)]);
+
+    if (mainRes.status==="rejected") {
+      if (!navigatedRef.current) { setError(mainRes.reason?.message||"Error desconocido"); setScreen("form"); }
+      return;
+    }
+    const parsed = mainRes.value;
+    if (!parsed||typeof parsed!=="object") {
+      if (!navigatedRef.current) { setError("Respuesta inválida"); setScreen("form"); }
+      return;
+    }
+    parsed.hotels = parsed.hotels||[];
+    parsed.transport_options = parsed.transport_options||[];
+    parsed.daily_itinerary = parsed.daily_itinerary||[];
+    parsed.recs = parsed.recs||[];
+    parsed.date_windows = parsed.date_windows||[];
+    const full = {...parsed,...form};
+    setResult(full); setBudget(form.budget||""); setSavedResult(full);
+    if (!navigatedRef.current) { navigatedRef.current=true; setScreen("results"); }
   }
 
   async function runInspire() {
     setScreen("inspire-loading"); setLoadStep(0); setError(null);
+    const si = setInterval(()=>setLoadStep(s=>Math.min(s+1,INSPIRE_STEPS.length-1)), 2800);
     const prompt = `Sugiere 3 destinos perfectos: Origen:${form.origin||"España"} | Días:${form.nights} | Presupuesto:${form.budget||"libre"}€ | Viajeros:${form.travelers} | Estilo:${form.style.join(",")||"general"}
 SOLO JSON: {"suggestions":[{"destination":"Ciudad, País","tagline":"frase corta","score":9,"why_fits":"2 frases","estimated_total":800,"best_months":"Abr-Jun","highlights":["cosa1","cosa2","cosa3"]}]}
 3 sugerencias muy diferentes. Empieza con { directamente.`;
     try {
-      const parsed = await callAPI(prompt, INSPIRE_STEPS, setLoadStep);
+      const parsed = await callAPI(prompt);
+      clearInterval(si);
       if(!parsed.suggestions?.length) throw new Error("Sin sugerencias");
       setInspireSuggestions(parsed.suggestions);
       setScreen("inspire-results");
-    } catch(e) { setError(e.message||"Error"); setScreen("form"); }
+    } catch(e) { clearInterval(si); setError(e.message||"Error"); setScreen("form"); }
   }
 
   function pickInspire(destination) {
@@ -825,17 +905,20 @@ SOLO JSON: {"suggestions":[{"destination":"Ciudad, País","tagline":"frase corta
   }
 
   if (screen==="loading") {
+    const allCuri = curiosities.length ? curiosities : FALLBACK_CURIOSITIES;
+    const curText = allCuri[curiIdx % allCuri.length];
     return (
       <div style={{ minHeight:"100vh", background:"#FFF", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"0 24px", fontFamily:"system-ui,sans-serif" }}>
-        <div style={{ fontWeight:800, fontSize:22, color:"#FF385C", marginBottom:40 }}>verai</div>
-        <div style={{ textAlign:"center", maxWidth:340 }}>
-          <div style={{ fontSize:20, fontWeight:700, marginBottom:28 }}>Analizando {form.destination}...</div>
-          {LOAD_STEPS.map((s,i)=>(
-            <div key={s} style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 14px", background:i===loadStep?"#F7F7F7":"transparent", borderRadius:10 }}>
-              <div style={{ width:18, height:18, borderRadius:"50%", flexShrink:0, background:i<loadStep?"#222":i===loadStep?"#FF385C":"#DDD", display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, color:"#fff", fontWeight:700 }}>{i<loadStep?"✓":""}</div>
-              <span style={{ fontSize:13, fontWeight:i===loadStep?600:400, color:i<=loadStep?"#222":"#717171" }}>{s}</span>
-            </div>
-          ))}
+        <div style={{ fontWeight:800, fontSize:20, color:"#FF385C", marginBottom:32 }}>verai</div>
+        <div style={{ textAlign:"center", maxWidth:340, width:"100%" }}>
+          <div style={{ fontSize:20, fontWeight:700, marginBottom:24 }}>Analizando {form.destination}...</div>
+          <div style={{ height:140, background:"#FFF", border:"1px solid #DDD", borderRadius:16, padding:24, display:"flex", alignItems:"center", justifyContent:"center", marginBottom:16, boxShadow:"0 2px 8px rgba(0,0,0,.08)" }}>
+            <div style={{ opacity:curiVisible?1:0, transition:"opacity .4s ease", fontSize:16, fontWeight:600, lineHeight:1.5, textAlign:"center" }}>✨ {curText}</div>
+          </div>
+          <div style={{ fontSize:14, color:"#717171", marginBottom:24, minHeight:20 }}>{SUBTITLES[subIdx]}</div>
+          <div style={{ height:2, background:"#F0F0F0", borderRadius:2, overflow:"hidden", width:240, margin:"0 auto" }}>
+            <div style={{ height:"100%", width:loadProgress+"%", background:"#FF385C", borderRadius:2, transition:"width 15s linear" }}/>
+          </div>
         </div>
       </div>
     );

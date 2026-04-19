@@ -13,6 +13,18 @@ export default async function handler(req, res) {
     body: JSON.stringify(req.body),
   });
 
-  const data = await response.json();
-  res.status(response.status).json(data);
+  if (req.body.stream) {
+    res.status(response.status);
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("X-Accel-Buffering", "no");
+    res.flushHeaders();
+    for await (const chunk of response.body) {
+      res.write(chunk);
+    }
+    res.end();
+  } else {
+    const data = await response.json();
+    res.status(response.status).json(data);
+  }
 }
